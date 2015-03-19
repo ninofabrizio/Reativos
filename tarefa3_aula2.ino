@@ -1,4 +1,4 @@
-// Primeira versao
+// Segunda versao
 
 #include "event_driven.c"
 
@@ -7,7 +7,13 @@
 
 void button_changed (int pin, int v) {
     
-    digitalWrite(LED_PIN, v);
+    if(pin == 13) // pin é do led?
+      digitalWrite(pin, v);
+}
+
+void timer_expired() {
+  
+    printf("Tempo expirado!\n");
 }
 
 void init () {
