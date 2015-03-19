@@ -1,9 +1,14 @@
-// Primeira versao
+// Segunda versao
 
+#define ms 10000
 
-//Timers
+//Timer
+// Teste: supostamente posso usar estas variaveis como timers que possa resetar quando queira
+extern volatile unsigned long timer0_overflow_count;
+
+/*
 unsigned long t1;
-unsigned long t2;
+*/
 
 // Pin
 int pin;
@@ -11,14 +16,13 @@ int pin;
 // Pin passado gera notificacoes
 void button_listen (int pin) {
   
-  //...
+    //...
 }
-
+  
 // Timer expira após ms milisegundos
 void timer_set (int ms) {
      
-    if(t1 >= ms)
-        t1 = 0; // Provisorio, nao deve 'resetar' a contagem....
+    timer0_overflow_count = 0;
 }
     
 void button_changed (int pin, int v);
@@ -28,15 +32,21 @@ void timer_expired (void);
     
 void setup () {
       
-    t1 = millis();
-    t2 = millis();
+    //timer0_overflow_count = millis();
     
     init();
 }
       
 void loop () {
-        //...
-    button_changed();
-        //...
-    timer_expired();
+  
+    // Detectando botao pressionado
+    if(digitalRead(BUT_PIN))
+      button_changed();
+    
+    // Vendo se timer deve expirar
+    if(timer0_overflow_count >= ms) {
+    
+      timer_set();
+      timer_expired();
+    }
 }
