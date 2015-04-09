@@ -41,6 +41,26 @@ int verifyDeath (SDL_Rect frog, SDL_Rect *enem) {
 	return 0;
 }
 
+/*
+// Coloca sapo e inimigos em suas posições iniciais de movimento
+void initialPos (SDL_Rect frog, SDL_Rect *enem, unsigned int *enemThen) {
+
+	int i;
+
+	frog.x = 333;
+	frog.y = 429;
+
+	for(i = 0; i < NUMMINIONS; i++) {
+		enem[i].x = 0;
+		enem[i].y = 344 - (68 * 2 * i);
+	}
+
+	enemThen[0] = SDL_GetTicks();
+	for(i = 1; i < NUMMINIONS; i++)
+		enemThen[i] = enemThen[i-1];
+}
+*/
+
 int main (int argc, char *args[]) {
 
     /* INITIALIZATION */
@@ -57,6 +77,9 @@ int main (int argc, char *args[]) {
 	// Parâmetro de loop
 	bool running = true;
 
+	// Controladores de botões
+	bool uPressed = false, dPressed = false, lPressed = false, rPressed = false, reset = false;
+
 	// Eventos
 	SDL_Event e;
 	SDL_KeyboardEvent *ke;
@@ -72,7 +95,7 @@ int main (int argc, char *args[]) {
 
     /* EXECUTION */
 
-    SDL_Rect frog = { 333, 429, 26, 26 };
+	SDL_Rect frog = {333, 429, 26, 26};
 
 	SDL_Rect enem[NUMMINIONS];
 	for(i = 0; i < NUMMINIONS; i++) {
@@ -81,6 +104,8 @@ int main (int argc, char *args[]) {
 		enem[i].x = 0;
 		enem[i].y = 344 - (68 * 2 * i);
 	}
+
+//	initialPos(frog, enem, enemThen);
 
 	drawAll(renderer, frog, enem, frogMov);
 
@@ -102,19 +127,22 @@ int main (int argc, char *args[]) {
 
 				switch(ke->keysym.sym){
                     case SDLK_LEFT:
-						if(frog.x - 32 > 0 && frogMov == 0) {
+						if(frog.x - 32 > 0 && frogMov == 0 && lPressed == false && rPressed != true && uPressed != true && dPressed != true) {
+							lPressed = true;
 							frog.x -= 32;
 							frogMov = verifyDeath(frog, enem);
 						}
                         break;
                     case SDLK_RIGHT:
-						if(frog.x + 32 + frog.w < 640 && frogMov == 0) {
+						if(frog.x + 32 + frog.w < 640 && frogMov == 0 && rPressed == false && lPressed != true && uPressed != true && dPressed != true) {
+							rPressed = true;
 							frog.x += 32;
 							frogMov = verifyDeath(frog, enem);
 						}
                         break;
                     case SDLK_UP:
-						if(frog.y - 68 > 0 && frogMov == 0) {
+						if(frog.y - 68 > 0 && frogMov == 0 && uPressed == false && rPressed != true && lPressed != true && dPressed != true) {
+							uPressed = true;
 							frog.y -= 68;
 							frogMov = verifyDeath(frog, enem);
 							if(frog.y <= 68)
@@ -122,11 +150,54 @@ int main (int argc, char *args[]) {
 						}
                         break;
                     case SDLK_DOWN:
-						if(frog.y + 68 + frog.h < 476 && frogMov == 0) {
+						if(frog.y + 68 + frog.h < 476 && frogMov == 0 && dPressed == false && rPressed != true && uPressed != true && lPressed != true) {
+							dPressed = true;
 							frog.y += 68;
 							frogMov = verifyDeath(frog, enem);
 						}
                         break;
+					case SDLK_r:
+						if(reset == false) {
+							reset = true;
+							frogMov = 0;
+							//initialPos(frog, enem, enemThen);
+							frog.x = 333;
+							frog.y = 429;
+
+							for(i = 0; i < NUMMINIONS; i++) {
+								enem[i].x = 0;
+								enem[i].y = 344 - (68 * 2 * i);
+							}
+
+							enemThen[0] = SDL_GetTicks();
+							for(i = 1; i < NUMMINIONS; i++)
+								enemThen[i] = enemThen[i-1];
+						}
+						break;
+                    default:
+                        break;
+				}
+				break;
+
+			case SDL_KEYUP:
+				ke = (SDL_KeyboardEvent *) &e;
+
+				switch(ke->keysym.sym){
+                    case SDLK_LEFT:
+						lPressed = false;
+                        break;
+                    case SDLK_RIGHT:
+						rPressed = false;
+                        break;
+                    case SDLK_UP:
+						uPressed = false;
+                        break;
+                    case SDLK_DOWN:
+						dPressed = false;
+                        break;
+					case SDLK_r:
+						reset = false;
+						break;
                     default:
                         break;
 				}
@@ -135,6 +206,9 @@ int main (int argc, char *args[]) {
 			// Tratando saída de janela
 			case SDL_QUIT:
 				running = false;
+				break;
+
+			default:
 				break;
 		}
 
