@@ -16,7 +16,7 @@ var _SDL_Window&? window;
 	end
 
 /* Assertiva de teste */
-/*_assert(win != null);*/
+//_assert(window != null);
 
 var _SDL_Renderer&? renderer;
 	finalize
@@ -26,7 +26,7 @@ var _SDL_Renderer&? renderer;
 	end
 
 /* Assertiva de teste */
-/*_assert(ren != null); */
+//_assert(renderer != null);
 
 _srand(_time(null)); /*Pra que serve?*/
 
@@ -63,8 +63,8 @@ do
 		end
 	with
 		every SDL_REDRAW do
-			_SDL_SetRenderDrawColor(ren, 0x00,0x00,0x00,0x00);
-			_SDL_RenderFillRect(ren, &this.r);
+			_SDL_SetRenderDrawColor(&ren, 0x00,0x00,0x00,0x00);
+			_SDL_RenderFillRect(&ren, &this.r);
 		end
 	end
 end
