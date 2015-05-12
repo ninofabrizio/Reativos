@@ -5,7 +5,7 @@ nos inimigos (retângulos pretos).
 
 Controles:
 - Setas: movimentam o retângulo verde pelo cenário, cada um na sua respectiva direção.
-- Click esquerdo do mouse: reseta o jogo, colocando todos os retângulos em posições iniciais e o retângulo controlado volta a seu estado original.
+- Click do mouse: reseta o jogo, colocando todos os retângulos em posições iniciais e o retângulo controlado volta a seu estado original.
 
 Jogo ganho: Atravessar a linha de cima, o retângulo controlado fica azul e o jogo para.
 
