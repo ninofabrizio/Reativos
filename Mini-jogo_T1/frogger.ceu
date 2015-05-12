@@ -6,6 +6,7 @@ input _SDL_KeyboardEvent* SDL_KEYDOWN; /* Eventos do teclado */
 input _SDL_MouseButtonEvent* SDL_MOUSEBUTTONDOWN; // Evento de click para reiniciar
 input int SDL_DT;
 
+// Janela
 var _SDL_Window&? window;
 	finalize
 		window = _SDL_CreateWindow("F R O G G E R",
@@ -16,9 +17,7 @@ var _SDL_Window&? window;
 		_SDL_DestroyWindow(&window);
 	end
 
-/* Assertiva de teste */
-//_assert(window != null);
-
+// Renderer para desenho
 var _SDL_Renderer&? renderer;
 	finalize
 		renderer = _SDL_CreateRenderer(&window, -1, 0);
@@ -26,17 +25,14 @@ var _SDL_Renderer&? renderer;
 		_SDL_DestroyRenderer(&renderer);
 	end
 
-/* Assertiva de teste */
-//_assert(renderer != null);
+// Para tratar eventos do teclado
+var _SDL_KeyboardEvent* key;
 
-_srand(_time(null)); /*Pra que serve?*/
-
-// Classe de inimigos
+// Classe dos inimigos
 class Enemy with
     	var _SDL_Rect r;
 	var _SDL_Renderer& ren;
     	var int speed;
-	//var bool touched = false;
 	event void collide;
 do
 	this.r.h = 60;
@@ -65,99 +61,45 @@ do
 		end
 	with
 		every SDL_REDRAW do
-			_SDL_SetRenderDrawColor(&ren, 0xFF,0x00,0x00,0x00);
+			_SDL_SetRenderDrawColor(&ren, 0x00,0x00,0x00,0x00);
 			_SDL_RenderFillRect(&ren, &this.r);
 		end
 	end
 end
 
-// Retângulo controlado pelo jogador
-var _SDL_Rect frog;
-frog.x = 333;
-frog.y = 429;
-frog.w = 26;
-frog.h = 26;
+// Classe do controlável
+class Frog with
+    	var _SDL_Rect rec;
+	var _SDL_Renderer& ren;
+	var int status; // 1 = vivo | 2 = ganhou | 3 = morreu
+	event void collide;
+do
+	rec.x = 333;
+	rec.y = 429;
+	rec.w = 26;
+	rec.h = 26;
 
-// Se sapo ainda está em jogo, ganhou ou perdeu
-// 1 = vivo | 2 = ganhou | 3 = morreu
-var int state = 1;
+	par/and do
+		await this.collide;
+		status = 3;
+	with
+		every SDL_REDRAW do
+			if status == 1 then
+				_SDL_SetRenderDrawColor(&ren, 0x00,0xFF,0x00,0x00);
+			else/if status == 2 then
+				_SDL_SetRenderDrawColor(&ren, 0x00,0x00,0xFF,0x00);
+			else
+				_SDL_SetRenderDrawColor(&ren, 0xFF,0x00,0x00,0x00);
+			end
 
-// Variável para auxiliar posição y dos inimigos
-var int pos = 0;
-
-pool Enemy[3] enemies;
+			_SDL_RenderFillRect(&ren, &this.rec);
+		end
+	end
+end
 
 // Execução principal
 par/or do
- // Posicionamento dos inimigos, colisao e sapo ganhar
-	loop do
-		par/or do
-			//pool Enemy[3] enemies;
-
-			every 1ms do
-				// Crio inimigo
-				spawn Enemy in enemies with
-					this.ren = renderer;
-					this.r.y = 344 + 68 - _rand()%350;
-					this.speed = 100 + _rand()%100;
-				end;
-				// Verifico colisao
-				loop (Enemy*)e1 in enemies do
-					if _SDL_HasIntersection(&e1:r,&frog) then
-						state = 3;
-						emit e1:collide;
-						loop (Enemy*)e2 in enemies do
-							if e1 != e2 then
-								emit e2:collide;
-							end
-						end
-					end
-				end
-				// Verifico sapo ganhar
-				if frog.y <= 68 then
-					state = 2;
-					var int size;
-					loop (Enemy*)e1 in enemies do
-						emit e1:collide;
-					end
-				end
-			end
-		with
-			var _SDL_MouseButtonEvent* but;
-			but = await SDL_MOUSEBUTTONDOWN;
-			if but then
-				state = 1;
-				frog.x = 333;
-				frog.y = 429;
-			end
-		end
-	end
-// Movendo retângulo controlado por jogador
-with
-	loop do
-		var _SDL_KeyboardEvent* key;
-		every key in SDL_KEYDOWN do
-			if key:keysym.sym == _SDLK_LEFT and state == 1 then
-				if frog.x - 32 > 0 then
-					frog.x = frog.x - 32;
-				end
-			else/if key:keysym.sym == _SDLK_RIGHT and state == 1 then
-				if frog.x + 32 + frog.w < 640 then
-					frog.x = frog.x + 32;
-				end
-			else/if key:keysym.sym == _SDLK_UP and state == 1 then
-				if frog.y - 68 > 0 then
-						frog.y = frog.y - 68;
-				end
-			else/if key:keysym.sym == _SDLK_DOWN and state == 1 then
-				if frog.y + 68 + frog.h < 476 then
-					frog.y = frog.y + 68;
-				end
-			end
-		end
-    	end
-// Desenhando
-with
+	// Montando fundo e linhas
 	every SDL_REDRAW do
 		// Cenário de fundo
 		_SDL_SetRenderDrawColor(&renderer, 0xFF,0xFF,0xFF,0x00);
@@ -167,23 +109,84 @@ with
 		_SDL_SetRenderDrawColor(&renderer, 0x00,0x00,0x00,0x00);
 		_SDL_RenderDrawLine(&renderer, 0, 408, 640, 408);
 		_SDL_RenderDrawLine(&renderer, 0, 68, 640, 68);
+	end
+// Criação de inimigos, do controlável e seus movimentos, verificação de perda e ganho
+// e tratando restart
+with
+	loop do
+		pool Enemy[4] enemies;
+				
+		var Frog f with
+			this.ren = renderer;
+		end;
 
-		// Retângulos inimigos
-		loop (Enemy*)e1 in enemies do
-			_SDL_RenderFillRect(&renderer, &e1);
-		end
+		par/or do
 
-		// Retângulo controlado por jogador
-		if state == 1 then
-			_SDL_SetRenderDrawColor(&renderer, 0x00,0xFF,0x00,0x00);
-		else/if state == 2 then
-			_SDL_SetRenderDrawColor(&renderer, 0x00,0x00,0xFF,0x00);
-		else
-			_SDL_SetRenderDrawColor(&renderer, 0xFF,0x00,0x00,0x00);
-		end
-
-		_SDL_RenderFillRect(&renderer, &frog);
-
+			f.status = 1;
+		// Crio cada inimigo
+			every SDL_DT do
+				spawn Enemy in enemies with
+					this.ren = renderer;
+					this.r.y = 73 + _rand()%271;
+					this.speed = 50 + _rand()%800;
+				end;
+				_SDL_RenderFillRect(&renderer, &this);
+			end
+		// Trato eventos do teclado
+		with
+			every key in SDL_KEYDOWN do
+				if key:keysym.sym == _SDLK_LEFT and f.status == 1 then
+					if f.rec.x - 32 > 0 then
+						f.rec.x = f.rec.x - 32;
+					end
+				else/if key:keysym.sym == _SDLK_RIGHT and f.status == 1 then
+					if f.rec.x + 32 + f.rec.w < 640 then
+						f.rec.x = f.rec.x + 32;
+					end
+				else/if key:keysym.sym == _SDLK_UP and f.status == 1 then
+					if f.rec.y - 68 > 0 then
+						f.rec.y = f.rec.y - 68;
+					end
+				else/if key:keysym.sym == _SDLK_DOWN and f.status == 1 then
+					if f.rec.y + 68 + f.rec.h < 476 then
+						f.rec.y = f.rec.y + 68;
+					end
+				end
+			end
+			_SDL_RenderFillRect(&renderer, &f);
+		// Verifico colisão
+		with
+			every SDL_DT do
+				loop (Enemy*)e1 in enemies do
+					if _SDL_HasIntersection(&e1:r,&f.rec) then //???
+						emit f.collide;
+						emit e1:collide;
+						loop (Enemy*)e2 in enemies do
+							if e2 != e1 then
+								emit e2:collide;
+							end
+						end
+					end
+				end
+			end
+		// Verifico jogo ganho
+		with
+			every SDL_DT do
+				if f.rec.y <= 68 then
+					f.status = 2;
+					loop (Enemy*)e in enemies do
+						emit e:collide;
+					end
+				end
+			end
+		// Restart
+		with
+			await SDL_MOUSEBUTTONDOWN;
+    		end
+	end
+// Desenhando
+with
+	every SDL_REDRAW do
 		_SDL_RenderPresent(&renderer);
 	end
 
