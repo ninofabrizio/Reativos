@@ -1,4 +1,4 @@
-Máquinas de Estado:
+# Máquinas de Estado:
 
 mov (dita estado de movimento do sapo [ganhou, perdeu, jogando]) - em drawAll
 
@@ -8,7 +8,7 @@ enemThen (dita o tempo de movimentação dos inimigos [velocidade]) - em main
 
 frogMov (dita estado de movimento do sapo [ganhou, perdeu, jogando]) - em main
 
-running (dita se jgo está em andamento [sapo não morreu, nem ganhou]) - em main
+running (dita se jogo está em andamento [sapo não morreu, nem ganhou]) - em main
 
 uPressed (dita se up foi apertado no teclado [movimenta sapo]) - em main
 

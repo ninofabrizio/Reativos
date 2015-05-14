@@ -1,0 +1,2 @@
+# Bugs
+- Inimigos que acabam de ser criados assim que jogador passa da linha de chegada continuam se movimentando e isso permite que outros sejam criados quando estes passam do limite da tela. Aparentemente só vale quando jogador ganha o jogo, não quando colide com alguém.
