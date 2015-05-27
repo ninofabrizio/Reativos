@@ -10,9 +10,10 @@ end
 
 var usrMsg msgRadio;
 msgRadio.d16[0] = 0;
+
 if nodeId == 11 then
 	msgRadio.source = nodeId;
-	msgRadio.target = BROADCAST; // ou 1
+	msgRadio.target = BROADCAST; // ou msgRadio.target = 1;
 	loop do
 		await 5s;
 		emit REQ_TEMP();
