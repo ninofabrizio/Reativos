@@ -1,5 +1,9 @@
 #include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
 
+// TODO:
+// Aparentemente funciona usando apenas um usrMsg, depois
+// tentar com modelo anterior de outras usrMsg
+
 var ushort nodeId = getNodeId();
 
 pktype usrMsg from radioMsg with
@@ -9,34 +13,47 @@ pktype usrMsg from radioMsg with
 end
 
 var ubyte stat;
-var usrMsg msgRadio, msgEnvio, msgReceber;
-msgRadio.d16[0] = 0;
-msgRadio.source = nodeId;
+var usrMsg msgRadio;//, msgEnvio, msgReceber;
+msgRadio.d16[0] = 0; // TODO precisa?
 
 par do
+	// Parte do envio de mensagem
 	loop do
-		await 5s;
-		var short seila = nodeId%10;
+		var short tEspera = nodeId - random()%5 + 1; // De 1 a 5
+		await (tEspera)s;
 		emit REQ_TEMP();
-		await (seila)s;
 		msgRadio.d16[0] = await TEMP;
+		msgRadio.source = nodeId;
+		if nodeId != 11 then
+			/*msgEnvio*/msgRadio.target = nodeId - 1;
+		else
+			/*msgEnvio*/msgRadio.target = 1;
+		end
 		stat = qPut(msgRadio);
 	end
 with
+	// Parte da lista de mensagens prontas
 	loop do
 		await Q_READY;
-		stat = qGet(msgEnvio);
-		if nodeId != 11 then
-			msgEnvio.target = nodeId - 1;
-		else
-			msgEnvio.target = 1;
-		end
-		emit SEND(msgEnvio);
+		stat = qGet(msgRadio/*msgEnvio*/);
+// TODO POSSIVEL ORIGEM DE ERRO:
+//		if nodeId != 11 then
+//			/*msgEnvio*/msgRadio.target = nodeId - 1;
+//		else
+//			/*msgEnvio*/msgRadio.target = 1;
+//		end
+		emit SEND(msgRadio/*msgEnvio*/);
 		await SEND_DONE;
 	end 
 with
+	// Parte de reenvio de mensagem
 	loop do
- 		msgReceber = await RECEIVE;
-		stat = qPut(msgReceber);
+ 		/*msgReceber*/msgRadio = await RECEIVE;
+		if nodeId != 11 then
+			/*msgEnvio*/msgRadio.target = nodeId - 1;
+		else
+			/*msgEnvio*/msgRadio.target = 1;
+		end
+		stat = qPut(msgRadio/*msgReceber*/);
 	end
 end
