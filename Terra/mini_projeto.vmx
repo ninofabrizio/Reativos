@@ -1,0 +1,363 @@
+71 362 3 1 0 0 8 4 8
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0 track 2
+00 | 00009 0
+00 | 00010 0
+00 | 00011 0
+00 | 00012 0 track 3
+00 | 00013 0
+00 | 00014 0
+00 | 00015 0
+00 | 00016 0000 wClock 0
+00 | 00017 0001
+00 | 00018 0002
+00 | 00019 0003
+00 | 00020 0004
+00 | 00021 0005
+00 | 00022 0006
+00 | 00023 0007
+00 | 00024 0008 inEvt 005 : TEMP
+00 | 00025 0009           : 01 gates
+00 | 00026 0010
+00 | 00027 0011
+00 | 00028 0012 inEvt 041 : SEND_DONE
+00 | 00029 0013           : 01 gates
+00 | 00030 0014
+00 | 00031 0015
+00 | 00032 0016 inEvt 045 : RECEIVE
+00 | 00033 0017           : 01 gates
+00 | 00034 0018
+00 | 00035 0019
+00 | 00036 0020 inEvt 046 : Q_READY
+00 | 00037 0021           : 01 gates
+00 | 00038 0022
+00 | 00039 0023
+00 | 00040 0024 $ret:1, 
+00 | 00041 0025 nodeId:2, 
+00 | 00042 0026 
+00 | 00043 0027 stat:1, 
+00 | 00044 0028 msgRadio:25, 
+00 | 00045 0029 
+00 | 00046 0030 
+00 | 00047 0031 
+00 | 00048 0032 
+00 | 00049 0033 
+00 | 00050 0034 
+00 | 00051 0035 
+00 | 00052 0036 
+00 | 00053 0037 
+00 | 00054 0038 
+00 | 00055 0039 
+00 | 00056 0040 
+00 | 00057 0041 
+00 | 00058 0042 
+00 | 00059 0043 
+00 | 00060 0044 
+00 | 00061 0045 
+00 | 00062 0046 
+00 | 00063 0047 
+00 | 00064 0048 
+00 | 00065 0049 
+00 | 00066 0050 
+00 | 00067 0051 
+00 | 00068 0052 
+00 | 00069 0053 tEspera:2, 
+00 | 00070 0054 
+c5 | 00071 c5 set16_c ushort 8 1281         | config gate TEMP with 1 await(s) - 0x0501 = 1281
+08 | 00072 08 
+05 | 00073 05 
+01 | 00074 01 
+c5 | 00075 c5 set16_c ushort 12 10497       | config gate SEND_DONE with 1 await(s) - 0x2901 = 10497
+0c | 00076 0c 
+29 | 00077 29 
+01 | 00078 01 
+c5 | 00079 c5 set16_c ushort 16 11521       | config gate RECEIVE with 1 await(s) - 0x2d01 = 11521
+10 | 00080 10 
+2d | 00081 2d 
+01 | 00082 01 
+c5 | 00083 c5 set16_c ushort 20 11777       | config gate Q_READY with 1 await(s) - 0x2e01 = 11777
+14 | 00084 14 
+2e | 00085 2e 
+01 | 00086 01 
+19 | 00087 19 func 0                        | func getNodeId
+00 | 00088 00 
+21 | 00089 21 popx ushort 25                | pop nodeId
+19 | 00090 19 
+c4 | 00091 c4 set16_c ushort 33 0           | msgRadio.d16[0] = 0
+21 | 00092 21 
+00 | 00093 00 
+94 | 00094 94 tkins_max 0 6                 | insert track ParEver_sub_1_6
+00 | 00095 .00 addr:104
+68 | 00096 .06 
+94 | 00097 94 tkins_max 0 7                 | insert track ParEver_sub_2_7
+00 | 00098 .00 addr:233
+e9 | 00099 .07 
+94 | 00100 94 tkins_max 0 8                 | insert track ParEver_sub_3_8
+01 | 00101 .00 addr:259
+03 | 00102 .08 
+01 | 00103 01 end                           | end
+28 | 00104 28 push_c 1                      | push 1
+01 | 00105 01 
+28 | 00106 28 push_c 5                      | push 5
+05 | 00107 05 
+19 | 00108 19 func 1                        | func random
+01 | 00109 01 
+08 | 00110 08 mod                           | mod
+31 | 00111 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00112 19 
+06 | 00113 06 sub                           | sub
+07 | 00114 07 add                           | add
+21 | 00115 21 popx short 53                 | pop tEspera
+35 | 00116 35 
+b1 | 00117 b1 clken_ve 0 1 short 53 18      | clock enable Awake_tEspera_18 (tEspera:short)s
+00 | 00118 00 
+01 | 00119 01 
+00 | 00120 00 
+35 | 00121 35 
+00 | 00122 .00 addr:125
+7d | 00123 .12 
+01 | 00124 01 end                           | end
+1a | 00125 1a outevt_z 9                    | emit REQ_TEMP
+09 | 00126 09 
+c5 | 00127 c5 set16_c ushort 10 21          | await TEMP[0]
+0a | 00128 0a 
+00 | 00129 .00 addr:132
+84 | 00130 .15 
+01 | 00131 01 end                           | end
+28 | 00132 28 push_c 33                     | push_c msgRadio.d16[0]
+21 | 00133 21 
+4c | 00134 4c getextdt_e 2                  | getExtData stack len=2
+02 | 00135 02 
+e4 | 00136 e4 set16_v ushort 29 25          | msgRadio.source = nodeId
+1d | 00137 1d 
+19 | 00138 19 
+28 | 00139 28 push_c 11                     | push 11
+0b | 00140 0b 
+31 | 00141 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00142 19 
+11 | 00143 11 neq                           | neq
+7f | 00144 7f ifelse 36 37                  | ifelse True_36 False_37
+00 | 00145 .00 addr:149
+95 | 00146 .24 
+00 | 00147 .00 addr:211
+d3 | 00148 .25 
+28 | 00149 28 push_c 10                     | push 10
+0a | 00150 0a 
+28 | 00151 28 push_c 10                     | push 10
+0a | 00152 0a 
+31 | 00153 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00154 19 
+06 | 00155 06 sub                           | sub
+15 | 00156 15 lt                            | lt
+7f | 00157 7f ifelse 33 34                  | ifelse True_33 False_34
+00 | 00158 .00 addr:162
+a2 | 00159 .21 
+00 | 00160 .00 addr:172
+ac | 00161 .22 
+28 | 00162 28 push_c 1                      | push 1
+01 | 00163 01 
+31 | 00164 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00165 19 
+06 | 00166 06 sub                           | sub
+21 | 00167 21 popx ushort 31                | pop msgRadio.target
+1f | 00168 1f 
+75 | 00169 75 exec 35                       | goto  35
+00 | 00170 .00 addr:217
+d9 | 00171 .26 
+28 | 00172 28 push_c 1                      | push 1
+01 | 00173 01 
+28 | 00174 28 push_c 10                     | push 10
+0a | 00175 0a 
+28 | 00176 28 push_c 10                     | push 10
+0a | 00177 0a 
+31 | 00178 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00179 19 
+0a | 00180 0a div                           | div
+09 | 00181 09 mult                          | mult
+31 | 00182 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00183 19 
+06 | 00184 06 sub                           | sub
+10 | 00185 10 eq                            | eq
+7f | 00186 7f ifelse 30 31                  | ifelse True_30 False_31
+00 | 00187 .00 addr:191
+bf | 00188 .1e 
+00 | 00189 .00 addr:201
+c9 | 00190 .1f 
+28 | 00191 28 push_c 10                     | push 10
+0a | 00192 0a 
+31 | 00193 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00194 19 
+06 | 00195 06 sub                           | sub
+21 | 00196 21 popx ushort 31                | pop msgRadio.target
+1f | 00197 1f 
+75 | 00198 75 exec 32                       | goto  32
+00 | 00199 .00 addr:217
+d9 | 00200 .26 
+28 | 00201 28 push_c 11                     | push 11
+0b | 00202 0b 
+31 | 00203 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00204 19 
+06 | 00205 06 sub                           | sub
+21 | 00206 21 popx ushort 31                | pop msgRadio.target
+1f | 00207 1f 
+75 | 00208 75 exec 32                       | goto  32
+00 | 00209 .00 addr:217
+d9 | 00210 .26 
+c4 | 00211 c4 set16_c ushort 31 1           | msgRadio.target = 1
+1f | 00212 1f 
+01 | 00213 01 
+75 | 00214 75 exec 38                       | goto  38
+00 | 00215 .00 addr:217
+d9 | 00216 .26 
+28 | 00217 28 push_c 28                     | push_c &msgRadio:usrMsg
+1c | 00218 1c 
+19 | 00219 19 func 10                       | func qPut
+0a | 00220 0a 
+20 | 00221 20 popx ubyte 27                 | pop stat
+1b | 00222 1b 
+75 | 00223 75 exec 12                       | goto  12
+00 | 00224 .00 addr:104
+68 | 00225 .0c 
+78 | 00226 78 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00227 00 
+08 | 00228 08 
+78 | 00229 78 memclr 10 2                   | clear EXT gates for TEMP
+0a | 00230 0a 
+02 | 00231 02 
+01 | 00232 01 end                           | end
+c5 | 00233 c5 set16_c ushort 22 42          | await Q_READY[0]
+16 | 00234 16 
+00 | 00235 .00 addr:238
+ee | 00236 .2a 
+01 | 00237 01 end                           | end
+28 | 00238 28 push_c 28                     | push_c &msgRadio:usrMsg
+1c | 00239 1c 
+19 | 00240 19 func 11                       | func qGet
+0b | 00241 0b 
+20 | 00242 20 popx ubyte 27                 | pop stat
+1b | 00243 1b 
+71 | 00244 71 outevtx_v 40 28               | emit SEND len=25 var=msgRadio
+28 | 00245 28 
+1c | 00246 1c 
+c5 | 00247 c5 set16_c ushort 14 46          | await SEND_DONE[0]
+0e | 00248 0e 
+00 | 00249 .00 addr:233
+e9 | 00250 .27 
+01 | 00251 01 end                           | end
+78 | 00252 78 memclr 14 2                   | clear EXT gates for SEND_DONE
+0e | 00253 0e 
+02 | 00254 02 
+78 | 00255 78 memclr 22 2                   | clear EXT gates for Q_READY
+16 | 00256 16 
+02 | 00257 02 
+01 | 00258 01 end                           | end
+c5 | 00259 c5 set16_c ushort 18 50          | await RECEIVE[0]
+12 | 00260 12 
+01 | 00261 .00 addr:264
+08 | 00262 .32 
+01 | 00263 01 end                           | end
+50 | 00264 50 getextdt_v 28 25              | getExtData msgRadio 25
+1c | 00265 1c 
+19 | 00266 19 
+28 | 00267 28 push_c 11                     | push 11
+0b | 00268 0b 
+31 | 00269 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00270 19 
+11 | 00271 11 neq                           | neq
+7f | 00272 7f ifelse 64 65                  | ifelse True_64 False_65
+01 | 00273 .00 addr:277
+15 | 00274 .40 
+01 | 00275 .00 addr:339
+53 | 00276 .41 
+28 | 00277 28 push_c 10                     | push 10
+0a | 00278 0a 
+28 | 00279 28 push_c 10                     | push 10
+0a | 00280 0a 
+31 | 00281 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00282 19 
+06 | 00283 06 sub                           | sub
+15 | 00284 15 lt                            | lt
+7f | 00285 7f ifelse 61 62                  | ifelse True_61 False_62
+01 | 00286 .00 addr:290
+22 | 00287 .3d 
+01 | 00288 .00 addr:300
+2c | 00289 .3e 
+28 | 00290 28 push_c 1                      | push 1
+01 | 00291 01 
+31 | 00292 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00293 19 
+06 | 00294 06 sub                           | sub
+21 | 00295 21 popx ushort 31                | pop msgRadio.target
+1f | 00296 1f 
+75 | 00297 75 exec 63                       | goto  63
+01 | 00298 .00 addr:345
+59 | 00299 .42 
+28 | 00300 28 push_c 1                      | push 1
+01 | 00301 01 
+28 | 00302 28 push_c 10                     | push 10
+0a | 00303 0a 
+28 | 00304 28 push_c 10                     | push 10
+0a | 00305 0a 
+31 | 00306 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00307 19 
+0a | 00308 0a div                           | div
+09 | 00309 09 mult                          | mult
+31 | 00310 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00311 19 
+06 | 00312 06 sub                           | sub
+10 | 00313 10 eq                            | eq
+7f | 00314 7f ifelse 58 59                  | ifelse True_58 False_59
+01 | 00315 .00 addr:319
+3f | 00316 .3a 
+01 | 00317 .00 addr:329
+49 | 00318 .3b 
+28 | 00319 28 push_c 10                     | push 10
+0a | 00320 0a 
+31 | 00321 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00322 19 
+06 | 00323 06 sub                           | sub
+21 | 00324 21 popx ushort 31                | pop msgRadio.target
+1f | 00325 1f 
+75 | 00326 75 exec 60                       | goto  60
+01 | 00327 .00 addr:345
+59 | 00328 .42 
+28 | 00329 28 push_c 11                     | push 11
+0b | 00330 0b 
+31 | 00331 31 pushx_v ushort 25             | push nodeId:ushort
+19 | 00332 19 
+06 | 00333 06 sub                           | sub
+21 | 00334 21 popx ushort 31                | pop msgRadio.target
+1f | 00335 1f 
+75 | 00336 75 exec 60                       | goto  60
+01 | 00337 .00 addr:345
+59 | 00338 .42 
+c4 | 00339 c4 set16_c ushort 31 1           | msgRadio.target = 1
+1f | 00340 1f 
+01 | 00341 01 
+75 | 00342 75 exec 66                       | goto  66
+01 | 00343 .00 addr:345
+59 | 00344 .42 
+28 | 00345 28 push_c 28                     | push_c &msgRadio:usrMsg
+1c | 00346 1c 
+19 | 00347 19 func 10                       | func qPut
+0a | 00348 0a 
+20 | 00349 20 popx ubyte 27                 | pop stat
+1b | 00350 1b 
+75 | 00351 75 exec 47                       | goto  47
+01 | 00352 .00 addr:259
+03 | 00353 .2f 
+78 | 00354 78 memclr 18 2                   | clear EXT gates for RECEIVE
+12 | 00355 12 
+02 | 00356 02 
+01 | 00357 01 end                           | end
+78 | 00358 78 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00359 00 
+08 | 00360 08 
+01 | 00361 01 end                           | end
