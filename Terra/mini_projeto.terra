@@ -47,6 +47,7 @@ with
 		msgRadio.target = paiId;
 		msgRadio.type = 2;
 		stat = qPut(msgRadio);
+		await 20s;
 	end
 with
 	// Parte da lista de mensagens prontas
