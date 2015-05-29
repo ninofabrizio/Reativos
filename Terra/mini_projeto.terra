@@ -1,70 +1,78 @@
 #include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
 
 // TODO
-// Aparentemente ocorrem colisões de sinais, havendo perda deles
-// Outro problema é que tem alguns nós que não repassam as mensagens (pra cima e pra esquerda)
+// TA TRAVANDO TUDO, mas resolve a parte pra saber pai
+// Caçar Bug passo-a-passo
+
+#define ESPERA 8
 
 var ushort nodeId = getNodeId();
 
 pktype usrMsg from radioMsg with
+	var ubyte[4] d8;
 	var ushort[4] d16;
+	var ulong[2] d32;
 end
 
 var ubyte stat;
-var usrMsg msgRadio;
+var ushort paiId = 0;
+var usrMsg msgRadio, ms;
 
 msgRadio.d16[0] = 0;
 
 par do
+	// Mensagem inicial pra saber quem é seu pai
+	if nodeId == 11 then		
+		paiId = 1;
+		msgRadio.source = nodeId;
+		msgRadio.target = BROADCAST;
+		msgRadio.type = 1;
+		emit SEND(msgRadio);
+		await SEND_DONE;
+	else/if paiId == 0 then
+		msgRadio = await RECEIVE(1);
+		paiId = msgRadio.source;
+		msgRadio.source = nodeId;
+//		emit LED1(ON);
+		emit SEND(msgRadio);
+		await SEND_DONE;	
+	end
+with
 	// Parte do envio de mensagem
+	await ESPERA s;
 	loop do
-		var short tEspera = nodeId - random()%10 + 1;
-		await (tEspera)s;
 		emit REQ_TEMP();
 		msgRadio.d16[0] = await TEMP;
 		msgRadio.source = nodeId;
-		if nodeId != 11 then
-			// Os extremos esquerdos (mandam pra cima)
-			if nodeId - 10 < 10 then
-				msgRadio.target = nodeId - 1;
-			// Os extremos acima (mandam pra esquerda)
-			else/if nodeId%10 == 1 then
-				msgRadio.target = nodeId - 10;
-			// O resto dos nós (mandam na diagonal esquerda superior)
-			else
-				msgRadio.target = nodeId - 11;
-			end
-		else
-			msgRadio.target = 1;
-		end
+		msgRadio.target = paiId;
+		msgRadio.type = 2;
 		stat = qPut(msgRadio);
 	end
 with
 	// Parte da lista de mensagens prontas
+	await ESPERA s;
 	loop do
 		await Q_READY;
-		stat = qGet(msgRadio);
-		emit SEND(msgRadio);
-		await SEND_DONE;
+		loop do
+			var ushort ran = random()%10 + 1;
+			var ushort tam = qSize();
+			await (ran) s;
+			if tam > 0 then
+				stat = qGet(msgRadio);
+				emit SEND(msgRadio);
+				await SEND_DONE;
+			else
+				break;
+			end
+		end
 	end 
 with
 	// Parte de reenvio de mensagem
+	await ESPERA s;
 	loop do
- 		msgRadio = await RECEIVE;
-		if nodeId != 11 then
-			// Os extremos esquerdos (mandam pra cima)
-			if nodeId - 10 < 10 then
-				msgRadio.target = nodeId - 1;
-			// Os extremos direitos (mandam pra esquerda)
-			else/if nodeId - (nodeId/10 * 10) == 1 then
-				msgRadio.target = nodeId - 10;
-			// O resto dos nós (mandam na diagonal esquerda superior)
-			else
-				msgRadio.target = nodeId - 11;
-			end
-		else
-			msgRadio.target = 1;
-		end
+ 		msgRadio = await RECEIVE(2);
+		msgRadio.target = paiId;
 		stat = qPut(msgRadio);
 	end
 end
+
