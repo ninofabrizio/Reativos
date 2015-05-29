@@ -1,8 +1,9 @@
 #include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
 
 // TODO
-// TA TRAVANDO TUDO, mas resolve a parte pra saber pai
-// Caçar Bug passo-a-passo
+// Algumas mensagens não são reenviadas e somente é mostrado no Control que os nós parentes
+// do 11 enviam mensagens. A frequência do envio de mensagens também diminui bastante conforme
+// passa o tempo de execução e chega até a parar.
 
 #define ESPERA 8
 
@@ -16,7 +17,7 @@ end
 
 var ubyte stat;
 var ushort paiId = 0;
-var usrMsg msgRadio, ms;
+var usrMsg msgRadio;
 
 msgRadio.d16[0] = 0;
 
@@ -47,7 +48,7 @@ with
 		msgRadio.target = paiId;
 		msgRadio.type = 2;
 		stat = qPut(msgRadio);
-		await 20s;
+		await 15s;
 	end
 with
 	// Parte da lista de mensagens prontas
@@ -76,4 +77,3 @@ with
 		stat = qPut(msgRadio);
 	end
 end
-
