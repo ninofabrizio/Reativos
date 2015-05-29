@@ -18,7 +18,7 @@ msgRadio.d16[0] = 0;
 par do
 	// Parte do envio de mensagem
 	loop do
-		var short tEspera = nodeId - random()%5 + 1;
+		var short tEspera = nodeId - random()%10 + 1;
 		await (tEspera)s;
 		emit REQ_TEMP();
 		msgRadio.d16[0] = await TEMP;
@@ -28,7 +28,7 @@ par do
 			if nodeId - 10 < 10 then
 				msgRadio.target = nodeId - 1;
 			// Os extremos acima (mandam pra esquerda)
-			else/if nodeId - (nodeId/10 * 10) == 1 then
+			else/if nodeId%10 == 1 then
 				msgRadio.target = nodeId - 10;
 			// O resto dos nós (mandam na diagonal esquerda superior)
 			else
