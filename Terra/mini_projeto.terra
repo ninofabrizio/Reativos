@@ -1,11 +1,21 @@
 #include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
 
-// TODO
-// Algumas mensagens não são reenviadas e somente é mostrado no Control que os nós parentes
-// do 11 enviam mensagens. A frequência do envio de mensagens também diminui bastante conforme
-// passa o tempo de execução e chega até a parar.
+// TODO O QUE MUDEI EM 02/06:
+// ESPERA para 5 segundos e na parte em que tiramos mensagens da lista mudei pra verificar primeiro
+// a lista vazia pra não fazer coisas desnecessárias. Mudei também o limite do random para máximo 5
+// para ter uma melhor noção se os nós estão enviando suas mensagens. O código no geral aparenta
+// estar funcionando bem, a questão é que se aumentarmos o tempo de espera para reenviar cada mensagem
+// da lista, dá a impressão que ele não é reenviado. Se retirar a parte da espera do valor randômico,
+// dá para entender melhor (neste caso, todos os nós enviam mensagens quase que simultaneamente,
+// ocorrendo colisões mínimas para 4x4). Fiz um pequeno teste na parte de mandar a mensagem original
+// de temperatura, tirando essa parte do par do para ocorrer apenas uma vez no código. Não fez muita
+// diferença, mas funciona tirando do comentário as partes que deixei e comentando o que deve ser
+// tirado do código para funcionar.
+// Como esperado, o código funciona melhor testando com 4x4 do que com 8x8 (tirando o random para
+// 8x8 os nós não enviavam para ninguém, somente o 11 funcionou).
+// Acredito que ainda persistam colisões, mas bem mínimas.
 
-#define ESPERA 8
+#define ESPERA 5
 
 var ushort nodeId = getNodeId();
 
@@ -22,23 +32,25 @@ var usrMsg msgRadio;
 msgRadio.d16[0] = 0;
 
 par do
-	// Mensagem inicial pra saber quem é seu pai
+	// Mensagem inicial pra saber quem é pai de cada um
 	if nodeId == 11 then		
 		paiId = 1;
 		msgRadio.source = nodeId;
 		msgRadio.target = BROADCAST;
 		msgRadio.type = 1;
 		emit SEND(msgRadio);
-		await SEND_DONE;
-	else/if paiId == 0 then
+		await SEND_DONE;//(1);
+	else/if nodeId != 11 and paiId == 0 then
 		msgRadio = await RECEIVE(1);
 		paiId = msgRadio.source;
 		msgRadio.source = nodeId;
 //		emit LED1(ON);
 		emit SEND(msgRadio);
-		await SEND_DONE;	
+		await SEND_DONE;//(1);
 	end
+//await 5s;
 with
+//par do
 	// Parte do envio de mensagem
 	await ESPERA s;
 	loop do
@@ -56,18 +68,19 @@ with
 	loop do
 		await Q_READY;
 		loop do
-			var ushort ran = random()%10 + 1;
+			var ushort ran;
 			var ushort tam = qSize();
-			await (ran) s;
-			if tam > 0 then
+			if tam == 0 then
+				break;
+			else
+				ran = random()%5 + 1;
+				await (ran) s;
 				stat = qGet(msgRadio);
 				emit SEND(msgRadio);
 				await SEND_DONE;
-			else
-				break;
 			end
 		end
-	end 
+	end
 with
 	// Parte de reenvio de mensagem
 	await ESPERA s;
