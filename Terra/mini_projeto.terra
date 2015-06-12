@@ -1,20 +1,5 @@
 #include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
 
-// TODO O QUE MUDEI EM 02/06:
-// ESPERA para 5 segundos e na parte em que tiramos mensagens da lista mudei pra verificar primeiro
-// a lista vazia pra não fazer coisas desnecessárias. Mudei também o limite do random para máximo 5
-// para ter uma melhor noção se os nós estão enviando suas mensagens. O código no geral aparenta
-// estar funcionando bem, a questão é que se aumentarmos o tempo de espera para reenviar cada mensagem
-// da lista, dá a impressão que ele não é reenviado. Se retirar a parte da espera do valor randômico,
-// dá para entender melhor (neste caso, todos os nós enviam mensagens quase que simultaneamente,
-// ocorrendo colisões mínimas para 4x4). Fiz um pequeno teste na parte de mandar a mensagem original
-// de temperatura, tirando essa parte do par do para ocorrer apenas uma vez no código. Não fez muita
-// diferença, mas funciona tirando do comentário as partes que deixei e comentando o que deve ser
-// tirado do código para funcionar.
-// Como esperado, o código funciona melhor testando com 4x4 do que com 8x8 (tirando o random para
-// 8x8 os nós não enviavam para ninguém, somente o 11 funcionou).
-// Acredito que ainda persistam colisões, mas bem mínimas.
-
 #define ESPERA 5
 
 var ushort nodeId = getNodeId();
@@ -44,7 +29,7 @@ par do
 		msgRadio = await RECEIVE(1);
 		paiId = msgRadio.source;
 		msgRadio.source = nodeId;
-//		emit LED1(ON);
+		emit LED2(ON);
 		emit SEND(msgRadio);
 		await SEND_DONE;//(1);
 	end
@@ -67,10 +52,12 @@ with
 	await ESPERA s;
 	loop do
 		await Q_READY;
+		emit LED1(ON);
 		loop do
 			var ushort ran;
 			var ushort tam = qSize();
 			if tam == 0 then
+				emit LED1(OFF);
 				break;
 			else
 				ran = random()%5 + 1;
