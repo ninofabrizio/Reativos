@@ -29,9 +29,9 @@ var _SDL_KeyboardEvent* key;
 
 // Classe dos inimigos
 class Enemy with
-    var _SDL_Rect r;
+	var _SDL_Rect r;
 	var _SDL_Renderer& ren;
-    var int speed;
+	var int speed;
 	event void collide;
 do
 	this.r.h = 60;
@@ -48,20 +48,18 @@ do
 					// Para se mover
 					var float v = dt*speed;
 					x = x + v/1000;
-            		r.x = x;
+            				r.x = x;
 
-            		// Quando chegar ao limite da tela
-            		if r.x > 540 then
-                		escape false;
-            		end
-        		end
-
-        	// Caso colida com controlável ou jogo foi ganho
+            				// Quando chegar ao limite da tela
+            				if r.x > 540 then
+                				escape false;
+            				end
+        			end
+        		// Caso colida com controlável ou jogo foi ganho
 			with
 				await this.collide;
 				escape true;
 			end;
-
 		// Fica parado até ocorrer o restart
 		if touched then
 			await FOREVER;
@@ -76,7 +74,7 @@ end
 
 // Classe do controlável
 class Frog with
-    var _SDL_Rect rec;
+	var _SDL_Rect rec;
 	var _SDL_Renderer& ren;
 	var int color = 1;
 	var _SDL_KeyboardEvent* key;
@@ -90,7 +88,6 @@ do
 
 	par/and do
 		par/or do
-
 		// Verificando colisão com inimigos
 			await this.collide;
 			this.color = 3;
@@ -140,7 +137,6 @@ end
 
 // Execução principal
 par/or do
-
 	// Montando fundo e linhas
 	every SDL_REDRAW do
 
@@ -158,49 +154,51 @@ par/or do
 with
 	loop do
 		pool Enemy[4] enemies;
-				
+
 		var Frog f with
 			this.ren = renderer;
 		end;
 
 		par/or do
-			every SDL_DT do
-
+			// Para tratar bug e garantir que não perca o jogo atual
+			par/and do
+				par/or do
 				// Crio cada inimigo
-				spawn Enemy in enemies with
-					this.ren = renderer;
-					this.r.y = 73 + _rand()%271;
-					this.speed = 50 + _rand()%800;
-				end;
-
-				// Verifico colisão
-				loop (Enemy*)e1 in enemies do
-					if _SDL_HasIntersection(&e1:r,&f.rec) then
-						emit f.collide;
-						emit e1:collide;
-						loop (Enemy*)e2 in enemies do
-							if e2 != e1 then
-								emit e2:collide;
+					every SDL_DT do
+						spawn Enemy in enemies with
+							this.ren = renderer;
+							this.r.y = 73 + _rand()%271;
+							this.speed = 50 + _rand()%800;
+						end;
+					end
+				// Verificando jogo ganho
+				with
+					await f.winner;
+					loop (Enemy*)e in enemies do
+						emit e:collide;
+					end
+				end
+			// Verifico colisão
+			with
+				every SDL_DT do
+					loop (Enemy*)e1 in enemies do
+						if _SDL_HasIntersection(&e1:r,&f.rec) then
+							emit f.collide;
+							emit e1:collide;
+							loop (Enemy*)e2 in enemies do
+								if e2 != e1 then
+									emit e2:collide;
+								end
 							end
 						end
 					end
 				end
 			end
-
-		// Verificando jogo ganho
-		with
-			await f.winner;
-			loop (Enemy*)e in enemies do
-				emit e:collide;
-			end
-			await FOREVER;
-
 		// Restart
 		with
 			await SDL_MOUSEBUTTONDOWN;
-    	end
+    		end
 	end
-
 // Desenhando
 with
 	every SDL_REDRAW do
