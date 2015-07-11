@@ -21,23 +21,23 @@ Um arquivo com código em linguagem Céu se encarrega de chamar o algoritmo e tr
 
 Um outro retângulo é desenhado (também usando SDL), representando um "pisca pisca" para simular a concorrência com o retângulo que vai percorrendo um mapa.
 
-## "Problema"
+## *Problema*
 
 Conforme o cálculo do mapa feito no algoritmo em C for demorando devido ao mapa ficar mais complexo, a mudança de cor do retângulo que "pisca" iria demorar mais.
 Isto mostra que apesar de ambas as operações de percurso e de piscar serem paralelas, uma acaba dependendo que a outra termine sua execução.
 
-## "Solução"
+## *Solução*
 
 Fazer uso do bloco async da linguagem Céu para executar em uma thread separada a operação de cálculo feita ao chamar a função para determinar caminhos no mapa.
 Possibilitando que o bloco que muda a cor do retângulo que pisca possa executar normalmente, mesmo o bloco paralelo a ela estar demorando.
 
-## "Como executar"
+## *Como executar*
 
 Bastaria compilar o arquivo part1.ceu e rodar o executável gerado para o programa principal funcionar.
 Porém, existe um problema no código que não pôde ser resolvido ao tentar se chamar a função nativa para se comunicar com a função contendo o algoritmo em C. Não achei uma solução sem comprometer muito o prazo de entrega do projeto.
 Como referência, o erro é apontado na linha 74 do código. O resto do código foi testado e parece estar funcional.
 
-## "Observações"
+## *Observações*
 
 Optei por este algoritmo devido a que a maioria dos algoritmos confiáveis que encontrei, e que abosdassem o A*, eram feitos em C++ ou Java.
 Tinha encontrado 2 algoritmos aparentemente bons em C, mas se tornaram um pouco mais complexos de entender para adaptar e usar, podendo me complicar mais no tempo disponível para realizar o projeto.
